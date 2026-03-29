@@ -1,27 +1,32 @@
-name: Lint Code Base
+name: Lint and Fix Code
 
-# Run this workflow every time you push code or open a pull request
-on: [push, pull_request]
+on: [push]
 
 jobs:
   run-lint:
-    name: Lint Code Base
     runs-on: ubuntu-latest
-
     permissions:
-      contents: read
-      packages: read
-      statuses: write
+      contents: write # Needed to save fixes back to your repo
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          # Full history is required for Super-Linter to compare changes
           fetch-depth: 0
 
-      - name: Lint Code Base
+      - name: Lint and Fix Code
         uses: super-linter/super-linter@v7
         env:
-          VALIDATE_ALL_CODEBASE: false # Only lint changed files to save time
+          # Change this to true to fix EVERYTHING currently in the repo
+          VALIDATE_ALL_CODEBASE: true 
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Enable fixing for common languages (add more as needed)
+          FIX_PYTHON: true
+          FIX_JAVASCRIPT_PRETTIER: true
+          FIX_MARKDOWN: true
+          FIX_CSS: true
+
+      - name: Commit fixes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-fix linting issues"
