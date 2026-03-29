@@ -1,0 +1,27 @@
+name: Lint Code Base
+
+# Run this workflow every time you push code or open a pull request
+on: [push, pull_request]
+
+jobs:
+  run-lint:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # Full history is required for Super-Linter to compare changes
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: super-linter/super-linter@v7
+        env:
+          VALIDATE_ALL_CODEBASE: false # Only lint changed files to save time
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
